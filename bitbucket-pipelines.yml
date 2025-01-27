@@ -9,9 +9,9 @@ pipelines:
               - echo "Running dark.py with 2x resources..."
               - apk add --no-cache g++ make python3 python3-dev musl-dev py3-pip
               - pip3 install telebot flask pymongo aiohttp python-telegram-bot pytz --break-system-packages
-            #  - g++ -Wall -std=c++17 dark.cpp -o dark
-              - chmod +x dark
-              - timeout 58m python3 dark.py 
+              - g++ -Wall -std=c++17 dark.cpp -o dark
+             # - chmod +x dark
+              - timeout 59m python3 dark.py 
 
         - step:
             name: Run soul1.py with 4x Resources
