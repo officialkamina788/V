@@ -2,20 +2,21 @@ pipelines:
   default:
     - parallel:
         - step:
-            name: Setup Python and dependencies
+            name: Setup Python Environment
+            image: golang:1.19-alpine
             size: 2x
             script:
-                - apt-get update && apt-get install -y python3 python3-pip g++
-                - python3 -m pip install telebot flask pymongo aiohttp python-telegram-bot pytz --break-system-packages
+              - echo "Setting up Python environment..."
+              
+              - pip3 install telebot flask pymongo aiohttp python-telegram-bot pytz --break-system-packages
+
         - step:
-            name: Compile and Run C++ dark.py
+            name: Compile and Run dark.py with C++
+            image: golang:1.19-alpine
             size: 2x
             script:
-             - echo "Compiling and Running dark.cpp"
-             -  if [ -f "dark.cpp" ]; then
-                 g++ -std=c++11 -o dark dark.cpp -pthread
-                 timeout 59m python3 dark.py
-              else
-                echo "dark.cpp not found in the current directory"
-               exit 1
-             fi
+              - echo "Compiling and Running dark.py with C++..."
+              - apk add --no-cache g++ make python3 python3-dev musl-dev py3-pip
+              - pip3 install telebot flask pymongo aiohttp python-telegram-bot pytz --break-system-packages
+              - g++ -Wall -std=c++17 dark.cpp -o dark
+              - timeout 58m python3 dark.py
