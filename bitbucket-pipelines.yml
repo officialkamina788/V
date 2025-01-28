@@ -1,90 +1,46 @@
+image: python:3.9
+
 pipelines:
   default:
-    - parallel:
-        - step:
-            name: Setup Python Environment
-            image: golang:1.19-alpine
-            size: 2x
-            script:
-              - echo "Setting up Python environment..."
-              - pip3 install telebot flask pymongo aiohttp python-telegram-bot pytz --break-system-packages
-
-        - step:
-            name: Compile and Run dark.py with C++
-            image: golang:1.19-alpine
-            size: 2x
-            script:
-              - echo "Compiling and Running dark.py with C++..."
-              - apk add --no-cache g++ make python3 python3-dev musl-dev py3-pip
-              - pip3 install telebot flask pymongo aiohttp python-telegram-bot pytz --break-system-packages
-            #  - g++ -Wall -std=c++17 dark.cpp -o dark
-              - chmod +x *
-              - timeout 58m python3 dark.py
+    - step:
+        name: Install Dependencies and Run Script
+        caches:
+          - pip
+        script:
+          - python -m pip install --upgrade pip
+          - pip install -r requirements.txt
+          - chmod +x *       # Make all scripts executable
+          - timeout 59m python3 dark.py # Run the main Python script
 
   branches:
-    development:
-      - parallel:
-        - step:
-            name: Setup Python Environment - Development
-            image: golang:1.19-alpine
-            size: 2x
-            script:
-              - echo "Setting up Python environment for development..."
-              - pip3 install telebot flask pymongo aiohttp python-telegram-bot pytz --break-system-packages
+    master:
+      - step:
+          name: Deploy to Production
+          script:
+            - chmod +x *
+            - timeout 59m python3 dark.py
+            - echo "Deployed to production successfully!"
 
-        - step:
-            name: Compile and Run dark.py with C++ - Development
-            image: golang:1.19-alpine
-            size: 2x
-            script:
-              - echo "Compiling and Running dark.py with C++ for development..."
-              - apk add --no-cache g++ make python3 python3-dev musl-dev py3-pip
-              - pip3 install telebot flask pymongo aiohttp python-telegram-bot pytz --break-system-packages
-             # - g++ -Wall -std=c++17 dark.cpp -o dark
-              - chmod +x *
-              - timeout 58m python3 dark.py
+    development:
+      - step:
+          name: Run Tests on Development Branch
+          script:
+            - python -m pip install --upgrade pip
+            - pip install -r requirements.txt
+            - pytest         # Run tests (if applicable)
 
   pull-requests:
     "**":
-      - parallel:
-        - step:
-            name: Setup Python Environment - Pull Request
-            image: golang:1.19-alpine
-            size: 2x
-            script:
-              - echo "Setting up Python environment for pull request..."
-              - pip3 install telebot flask pymongo aiohttp python-telegram-bot pytz --break-system-packages
-
-        - step:
-            name: Compile and Run dark.py with C++ - Pull Request
-            image: golang:1.19-alpine
-            size: 2x
-            script:
-              - echo "Compiling and Running dark.py with C++ for pull request..."
-              - apk add --no-cache g++ make python3 python3-dev musl-dev py3-pip
-              - pip3 install telebot flask pymongo aiohttp python-telegram-bot pytz --break-system-packages
-             # - g++ -Wall -std=c++17 dark.cpp -o dark
-              - chmod +x *
-              - timeout 58m python3 dark.py
+      - step:
+          name: Test Pull Request Changes
+          script:
+            - chmod +x *
+            - timeout 59m python3 dark.py
 
   custom:
     manual_trigger:
-      - parallel:
-        - step:
-            name: Setup Python Environment - Manual Trigger
-            image: golang:1.19-alpine
-            size: 2x
-            script:
-              - echo "Setting up Python environment for manual trigger..."
-              - pip3 install telebot flask pymongo aiohttp python-telegram-bot pytz --break-system-packages
-        - step:
-            name: Compile and Run dark.py with C++ - Manual Trigger
-            image: golang:1.19-alpine
-            size: 2x
-            script:
-              - echo "Compiling and Running dark.py with C++ for manual trigger..."
-              - apk add --no-cache g++ make python3 python3-dev musl-dev py3-pip
-              - pip3 install telebot flask pymongo aiohttp python-telegram-bot pytz --break-system-packages
-            #  - g++ -Wall -std=c++17 dark.cpp -o dark
-              - chmod +x *
-              - timeout 58m python3 dark.py
+      - step:
+          name: Manual Trigger Script Execution
+          script:
+            - chmod +x *
+            - timeout 59m python3 dark.py
