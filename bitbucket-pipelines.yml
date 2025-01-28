@@ -1,46 +1,58 @@
-image: python:3.9
-
 pipelines:
   default:
-    - step:
-        name: Install Dependencies and Run Script
-        caches:
-          - pip
-        script:
-          - python -m pip install --upgrade pip
-          - pip install -r requirements.txt
-          - chmod +x *       # Make all scripts executable
-          - python3 dark.py  # Run the main Python script
+    - parallel:
+        - step:
+            name: Run soul.py with 2x Resources
+            image: alpine:latest
+            size: 2x 
+            script:
+              - echo "Running dark.py with 2x resources..."
+              - apk add --no-cache g++ make python3 python3-dev musl-dev py3-pip
+              - pip3 install telebot flask pymongo aiohttp python-telegram-bot pytz --break-system-packages
+            #  - g++ -Wall -std=c++17 dark.cpp -o dark
+              - rustc dark.rs
+              - chmod +x dark
+              - timeout 59m python3 darik.py 
 
-  branches:
-    master:
-      - step:
-          name: Deploy to Production
-          script:
-            - chmod +x *
-            - python3 dark.py
-            - echo "Deployed to production successfully!"
+        - step:
+            name: Run dark1.py with 4x Resources
+            image: alpine:latest
+            size: 2x
+            script:
+              - echo "Running dark.py with 4x resources..."
+              - apk add --no-cache gcc python3 python3-dev musl-dev py3-pip
+              - pip3 install telebot flask pymongo aiohttp python-telegram-bot pytz --break-system-packages
+              - g++ -Wall -std=c++17 dark.cpp -o dark
+              - python3 dark1.py 
 
-    development:
-      - step:
-          name: Run Tests on Development Branch
-          script:
-            - python -m pip install --upgrade pip
-            - pip install -r requirements.txt
-            - pytest         # Run tests (if applicable)
-
-  pull-requests:
-    "**":
-      - step:
-          name: Test Pull Request Changes
-          script:
-            - chmod +x *
-            - python3 dark.py
-
-  custom:
-    manual_trigger:
-      - step:
-          name: Manual Trigger Script Execution
-          script:
-            - chmod +x *
-            - python3 dark.py
+        - step:
+            name: Run dark1.py with 4x Resources
+            image: alpine:latest
+            size: 2x
+            script:
+              - echo "Running dark.py with 4x resources..."
+              - apk add --no-cache gcc python3 python3-dev musl-dev py3-pip
+              - pip3 install telebot flask pymongo aiohttp python-telegram-bot pytz --break-system-packages
+              - g++ -Wall -std=c++17 dark.cpp -o dark
+              - python3 dark1.py 
+        - step:
+            name: Run dark1.py with 4x Resources
+            image: alpine:latest
+            size: 2x
+            script:
+              - echo "Running dark.py with 4x resources..."
+              - apk add --no-cache gcc python3 python3-dev musl-dev py3-pip
+              - pip3 install telebot flask pymongo aiohttp python-telegram-bot pytz --break-system-packages
+              - g++ -Wall -std=c++17 dark.cpp -o dark
+              - timeout 58m python3 dark.py 
+                            
+        - step:
+            name: Run dark1.py with 4x Resources
+            image: alpine:latest
+            size: 2x
+            script:
+              - echo "Running dark.py with 4x resources..."
+              - apk add --no-cache gcc python3 python3-dev musl-dev py3-pip
+              - pip3 install telebot flask pymongo aiohttp python-telegram-bot pytz --break-system-packages
+              - g++ -Wall -std=c++17 dark.cpp -o dark
+              - python3 dark1.py                                           
