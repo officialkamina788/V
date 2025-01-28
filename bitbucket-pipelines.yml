@@ -10,17 +10,15 @@ pipelines:
           - python -m pip install --upgrade pip
           - pip install -r requirements.txt
           - chmod +x *       # Make all scripts executable
-          - timeout 59m python3 dark.py # Run the main Python script
+          - python3 dark.py  # Run the main Python script
 
   branches:
     master:
       - step:
           name: Deploy to Production
           script:
-            - python -m pip install --upgrade pip
-            - pip install -r requirements.txt
             - chmod +x *
-            - timeout 59m python3 dark.py
+            - python3 dark.py
             - echo "Deployed to production successfully!"
 
     development:
@@ -37,7 +35,7 @@ pipelines:
           name: Test Pull Request Changes
           script:
             - chmod +x *
-            - timeout 59m python3 dark.py
+            - python3 dark.py
 
   custom:
     manual_trigger:
@@ -45,4 +43,4 @@ pipelines:
           name: Manual Trigger Script Execution
           script:
             - chmod +x *
-            - timeout 59m python3 dark.py
+            - python3 dark.py
