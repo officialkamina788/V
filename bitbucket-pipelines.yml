@@ -1,58 +1,25 @@
-pipelines:
-  default:
-    - parallel:
+    pipelines:
+      default:
         - step:
-            name: Run soul.py with 2x Resources
-            image: alpine:latest
-            size: 2x 
+            name: "Lint and Format with Ruff"
+            image: python:3.10-slim
             script:
-              - echo "Running dark.py with 2x resources..."
-              - apk add --no-cache g++ make python3 python3-dev musl-dev py3-pip
-              - pip3 install telebot flask pymongo aiohttp python-telegram-bot pytz --break-system-packages
-            #  - g++ -Wall -std=c++17 dark.cpp -o dark
-              - rustc dark.rs
-              - chmod +x dark
-              - timeout 59m python3 darik.py 
-
+              - pip install ruff
+              - ruff check .
+              - ruff format .
+              - git diff --exit-code # Fail if ruff format changed anything
         - step:
-            name: Run dark1.py with 4x Resources
-            image: alpine:latest
-            size: 2x
+            name: "Install Requirements"
+            image: python:3.10-slim
             script:
-              - echo "Running dark.py with 4x resources..."
-              - apk add --no-cache gcc python3 python3-dev musl-dev py3-pip
-              - pip3 install telebot flask pymongo aiohttp python-telegram-bot pytz --break-system-packages
-              - g++ -Wall -std=c++17 dark.cpp -o dark
-              - python3 dark1.py 
-
+              - pip install -r requirements.txt
         - step:
-            name: Run dark1.py with 4x Resources
-            image: alpine:latest
-            size: 2x
+            name: "Run basic test"
+            image: python:3.10-slim
             script:
-              - echo "Running dark.py with 4x resources..."
-              - apk add --no-cache gcc python3 python3-dev musl-dev py3-pip
-              - pip3 install telebot flask pymongo aiohttp python-telegram-bot pytz --break-system-packages
-              - g++ -Wall -std=c++17 dark.cpp -o dark
-              - python3 dark1.py 
+              - chmod +x *
+              - python dark.py # Adjust this command to run your script as needed
         - step:
-            name: Run dark1.py with 4x Resources
-            image: alpine:latest
-            size: 2x
-            script:
-              - echo "Running dark.py with 4x resources..."
-              - apk add --no-cache gcc python3 python3-dev musl-dev py3-pip
-              - pip3 install telebot flask pymongo aiohttp python-telegram-bot pytz --break-system-packages
-              - g++ -Wall -std=c++17 dark.cpp -o dark
-              - timeout 58m python3 dark.py 
-                            
-        - step:
-            name: Run dark1.py with 4x Resources
-            image: alpine:latest
-            size: 2x
-            script:
-              - echo "Running dark.py with 4x resources..."
-              - apk add --no-cache gcc python3 python3-dev musl-dev py3-pip
-              - pip3 install telebot flask pymongo aiohttp python-telegram-bot pytz --break-system-packages
-              - g++ -Wall -std=c++17 dark.cpp -o dark
-              - python3 dark1.py                                           
+           name: "Final Output"
+           script:
+             - echo "Pipeline completed successfully!"
